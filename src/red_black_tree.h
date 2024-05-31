@@ -67,6 +67,9 @@ private:
                 root->right = new Node<T>(value, NodeColor::RED);
                 root->right->parent = root;
 
+                if (root->color == NodeColor::RED) // TODO(To test)
+                    FixRedUncleViolation(root->right); // TODO(Check the parent on the violation)
+
                 return;
             }
             
@@ -78,6 +81,9 @@ private:
         {
             root->left = new Node<T>(value, NodeColor::RED);
             root->left->parent = root;
+
+            if (root->color == NodeColor::RED) // TODO(To test)
+                FixRedUncleViolation(root->left); // TODO(Check the parent on the violation)
 
             return;
         }
@@ -108,9 +114,30 @@ private:
         CleanUp(right);
     }
 
-    void FixViolations()
+    void FixRedUncleViolation(Node<T>* node)
     {
+        Node<T>* grandParent = node->parent->parent;
 
+        if (!grandParent)
+            return;
+
+        Node<T>* uncle = nullptr;
+
+        if (node->data >= grandParent->data) // Right subtree
+            uncle = grandParent->left;
+        else // Left subtree
+            uncle = grandParent->right;
+
+        if (!uncle)
+            return;
+
+        if (uncle->color == NodeColor::RED)
+        {
+            uncle->color = NodeColor::BLACK;
+            node->parent->color = NodeColor::BLACK;
+
+            grandParent->color = NodeColor::RED;
+        }
     }
 private:
     Node<T>* m_Root = nullptr;

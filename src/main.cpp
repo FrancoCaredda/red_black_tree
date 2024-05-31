@@ -11,6 +11,10 @@ int main(int argc, char** argv)
     tree.Insert(1);
     tree.Insert(3);
     tree.Insert(6);
+    tree.Insert(5);
+    tree.Insert(8);
+    tree.Insert(7);
+    tree.Insert(9);
 
     tree.Bypass([](int value) {
         std::cout << value << " ";
