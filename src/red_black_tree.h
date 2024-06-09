@@ -67,8 +67,8 @@ private:
                 root->right = new Node<T>(value, NodeColor::RED);
                 root->right->parent = root;
 
-                if (root->color == NodeColor::RED) // TODO(To test)
-                    FixRedUncleViolation(root->right); // TODO(Check the parent on the violation)
+                if (root->right->color == NodeColor::RED)
+                    FixRedUncleViolationUpwards(root->right);
 
                 return;
             }
@@ -82,8 +82,8 @@ private:
             root->left = new Node<T>(value, NodeColor::RED);
             root->left->parent = root;
 
-            if (root->color == NodeColor::RED) // TODO(To test)
-                FixRedUncleViolation(root->left); // TODO(Check the parent on the violation)
+            if (root->left->color == NodeColor::RED)
+                FixRedUncleViolationUpwards(root->left);
 
             return;
         }
@@ -114,6 +114,17 @@ private:
         CleanUp(right);
     }
 
+    void FixRedUncleViolationUpwards(Node<T>* node)
+    {
+        Node<T>* currentNode = node;
+
+        while (currentNode->parent)
+        {
+            FixRedUncleViolation(currentNode);
+            currentNode = currentNode->parent;
+        }
+    }
+
     void FixRedUncleViolation(Node<T>* node)
     {
         Node<T>* grandParent = node->parent->parent;
@@ -138,7 +149,29 @@ private:
 
             grandParent->color = NodeColor::RED;
         }
+        //else if (uncle == grandParent->left) // Right child
+        //{
+        //    LeftRotate(node->parent);
+        //}
+        //else if (uncle == grandParent->right) // Left child
+        //{
+        //    RightRotate(grandParent);
+        //}
     }
+
+   /* void LeftRotate(Node<T>* node)
+    {
+        Node<T>* y = node->right;
+        y->parent = node->parent;
+        node->right = y->left;
+
+        if (!y->parent)
+            m_Root = y;
+
+        if (y->left)
+
+    }*/
+
 private:
     Node<T>* m_Root = nullptr;
 };
