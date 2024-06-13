@@ -57,6 +57,8 @@ public:
     {
         CleanUp(m_Root);
     }
+
+    friend class RedBlackTreeHelper;
 private:
     void InsertInternal(T value, Node<T>* root)
     {
@@ -66,9 +68,6 @@ private:
             {
                 root->right = new Node<T>(value, NodeColor::RED);
                 root->right->parent = root;
-
-                if (root->right->color == NodeColor::RED)
-                    FixRedUncleViolationUpwards(root->right);
 
                 return;
             }
@@ -81,9 +80,6 @@ private:
         {
             root->left = new Node<T>(value, NodeColor::RED);
             root->left->parent = root;
-
-            if (root->left->color == NodeColor::RED)
-                FixRedUncleViolationUpwards(root->left);
 
             return;
         }
@@ -114,66 +110,109 @@ private:
         CleanUp(right);
     }
 
-    void FixRedUncleViolationUpwards(Node<T>* node)
-    {
-        Node<T>* currentNode = node;
-
-        while (currentNode->parent)
-        {
-            FixRedUncleViolation(currentNode);
-            currentNode = currentNode->parent;
-        }
-    }
-
-    void FixRedUncleViolation(Node<T>* node)
-    {
-        Node<T>* grandParent = node->parent->parent;
-
-        if (!grandParent)
-            return;
-
-        Node<T>* uncle = nullptr;
-
-        if (node->data >= grandParent->data) // Right subtree
-            uncle = grandParent->left;
-        else // Left subtree
-            uncle = grandParent->right;
-
-        if (!uncle)
-            return;
-
-        if (uncle->color == NodeColor::RED)
-        {
-            uncle->color = NodeColor::BLACK;
-            node->parent->color = NodeColor::BLACK;
-
-            grandParent->color = NodeColor::RED;
-        }
-        //else if (uncle == grandParent->left) // Right child
-        //{
-        //    LeftRotate(node->parent);
-        //}
-        //else if (uncle == grandParent->right) // Left child
-        //{
-        //    RightRotate(grandParent);
-        //}
-    }
-
-   /* void LeftRotate(Node<T>* node)
+    void LeftRotate(Node<T>* node)
     {
         Node<T>* y = node->right;
-        y->parent = node->parent;
+
+        if (y == nullptr)
+            return;
+        
         node->right = y->left;
 
-        if (!y->parent)
+        if (y->left != nullptr)
+            y->left->parent = node;
+
+        y->parent = node->parent;
+        if (node->parent == nullptr)
             m_Root = y;
+        else if (IsLeftChild(node))
+            node->parent->left = y;
+        else
+            node->parent->right = y;
 
-        if (y->left)
+        y->left = node;
+        node->parent = y;
+    }
 
-    }*/
+    void RightRotate(Node<T>* node)
+    {
+        Node<T>* y = node->left;
 
+        if (y == nullptr)
+            return;
+
+        node->left = y->right;
+
+        if (y->right != nullptr)
+            y->right->parent = node;
+
+        y->parent = node->parent;
+        if (node->parent == nullptr)
+            m_Root = y;
+        else if (IsLeftChild(node))
+            node->parent->left = y;
+        else
+            node->parent->right = y;
+
+        y->right = node;
+        node->parent = y;
+    }
+
+    inline bool IsRed(const Node<T>* const node) const noexcept 
+    { return node != nullptr && node->color == NodeColor::RED; }
+
+    inline bool IsRightChild(const Node<T>* const node) const noexcept
+    { return node->parent->right == node; }
+
+    inline bool IsLeftChild(const Node<T>* const node) const noexcept
+    { return node->parent->left == node; }
+
+    Node<T>* GetUncle(Node<T>* node) const noexcept
+    {
+        if (node->parent == nullptr || 
+            node->parent->parent == nullptr)
+            return nullptr;
+
+        Node<T>* parent = node->parent;
+        Node<T>* grandParent = parent->parent;
+
+        if (grandParent->left == parent)
+            return grandParent->right;
+
+        return grandParent->left;
+    }
 private:
     Node<T>* m_Root = nullptr;
 };
 
+
+class RedBlackTreeHelper final
+{
+public:
+    template<typename T>
+    static void PrintTree(const RedBlackTree<T>& tree)
+    {
+        Node<T>* currentNode = tree.m_Root;
+
+        std::cout << "[" << currentNode->data << ", " << (int)currentNode->color << "]\n";
+        PrintSubtree(currentNode->left, 1, 'l');
+        PrintSubtree(currentNode->right, 1, 'r');
+    }
+private:
+    template<typename T>
+    static void PrintSubtree(Node<T>* node, int level, char side)
+    {
+        if (node == nullptr)
+            return;
+
+        for (int i = 0; i < level - 1; i++)
+            std::cout << "     ";
+
+        std::cout << "|--> [" << node->data << ", " << (int)node->color << ", " << side << "]\n";
+
+        PrintSubtree(node->left, level + 1, 'l');
+        PrintSubtree(node->right, level + 1, 'r');
+    }
+};
+    
 #endif
