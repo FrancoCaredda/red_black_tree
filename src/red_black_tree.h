@@ -3,6 +3,7 @@
 
 #include <cinttypes>
 #include <functional>
+#include <algorithm>
 
 enum class NodeColor : uint8_t
 {
@@ -37,7 +38,25 @@ public:
             return;
         }
 
-        InsertInternal(value, m_Root);
+        Node<T>* node;
+        InsertInternal(value, m_Root, &node);
+
+        // Check for violations
+
+        while (node != nullptr &&
+               node->parent != nullptr)
+        {
+            if (IsRed(node->parent) && IsRed(GetUncle(node)))
+            {
+                FixRedUncleViolation(node);
+            }
+            else if (IsRed(node->parent))
+            {
+                FixBlackUncleViolation(node);
+            }
+
+            node = node->parent;
+        }
     }
 
     bool Search(T value) const
@@ -60,7 +79,7 @@ public:
 
     friend class RedBlackTreeHelper;
 private:
-    void InsertInternal(T value, Node<T>* root)
+    void InsertInternal(T value, Node<T>* root, Node<T>** outNode = nullptr)
     {
         if (value >= root->data)
         {
@@ -69,10 +88,13 @@ private:
                 root->right = new Node<T>(value, NodeColor::RED);
                 root->right->parent = root;
 
+                if (outNode)
+                    *outNode = root->right;
+
                 return;
             }
             
-            InsertInternal(value, root->right);
+            InsertInternal(value, root->right, outNode);
             return;
         }
 
@@ -81,10 +103,13 @@ private:
             root->left = new Node<T>(value, NodeColor::RED);
             root->left->parent = root;
 
+            if (outNode)
+                *outNode = root->left;
+
             return;
         }
 
-        InsertInternal(value, root->left);
+        InsertInternal(value, root->left, outNode);
     }
 
     void BypassInternal(const std::function<void(T)>& callback, Node<T>* root)
@@ -180,6 +205,63 @@ private:
             return grandParent->right;
 
         return grandParent->left;
+    }
+
+    void FixRedUncleViolation(Node<T>* node)
+    {
+        Node<T>* uncle = GetUncle(node);
+
+        if (uncle)
+            uncle->color = NodeColor::BLACK;
+
+        node->parent->color = NodeColor::BLACK;
+
+        if (node->parent->parent != m_Root)
+            node->parent->parent->color = NodeColor::RED;
+    }
+
+    void ApplyLeftLeftFix(Node<T>* grandParent)
+    {
+        RightRotate(grandParent);
+        std::swap(grandParent->color, grandParent->parent->color);
+    }
+    void ApplyRightRightFix(Node<T>* grandParent)
+    {
+        LeftRotate(grandParent);
+        std::swap(grandParent->color, grandParent->parent->color);
+    }
+    void FixBlackUncleViolation(Node<T>* node)
+    {
+        if (node == nullptr || node->parent == nullptr 
+            || node->parent->parent == nullptr)
+            return;
+
+        // Left
+        if (node->parent->parent->left == node->parent)
+        {
+            if (node->parent->left == node) // left case
+            {
+                ApplyLeftLeftFix(node->parent->parent);
+            }
+            else // right case
+            {
+                LeftRotate(node->parent);
+                ApplyLeftLeftFix(node->parent);
+            }
+        }
+        else // Right
+        {
+            if (node->parent->right == node) // right case
+            {
+                ApplyRightRightFix(node->parent->parent);
+            }
+            else // left case
+            {
+                RightRotate(node->parent);
+                ApplyRightRightFix(node->parent);
+            }
+        }
+
     }
 private:
     Node<T>* m_Root = nullptr;
