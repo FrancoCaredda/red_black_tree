@@ -4,6 +4,7 @@
 #include <cinttypes>
 #include <functional>
 #include <algorithm>
+#include <iostream>
 
 enum class NodeColor : uint8_t
 {
@@ -283,7 +284,6 @@ private:
     Node<T>* m_Root = nullptr;
 };
 
-
 class RedBlackTreeHelper final
 {
 public:
@@ -295,6 +295,12 @@ public:
         std::cout << "[" << currentNode->data << ", " << (int)currentNode->color << "]\n";
         PrintSubtree(currentNode->left, 1, 'l');
         PrintSubtree(currentNode->right, 1, 'r');
+    }
+
+    template<typename T>
+    static void PrintTreeAsList(const RedBlackTree<T>& tree)
+    {
+        PrintTreeAsListInternal(tree.m_Root, ' ');
     }
 private:
     template<typename T>
@@ -310,6 +316,36 @@ private:
 
         PrintSubtree(node->left, level + 1, 'l');
         PrintSubtree(node->right, level + 1, 'r');
+    }
+
+    template<typename T>
+    static void PrintTreeAsListInternal(Node<T>* root, char side)
+    {
+        if ((!root) || (!root->left && !root->right))
+            return;
+
+        std::cout << "[" << root->data << ", " << (int)root->color;
+
+        if (root->parent != nullptr)
+            std::cout << ", " << side;
+        std::cout << "]: ";
+
+
+        if (root->left)
+        {
+            std::cout << "[" << root->left->data << ", " 
+                << (int)root->left->color << ", " << "l" << "] ";
+        }
+
+        if (root->right)
+        {
+            std::cout << "[" << root->right->data << ", "
+                << (int)root->right->color << ", " << "r" << "] ";
+        }
+
+        std::cout << "\n";
+        PrintTreeAsListInternal(root->left, 'l');
+        PrintTreeAsListInternal(root->right, 'r');
     }
 };
     
