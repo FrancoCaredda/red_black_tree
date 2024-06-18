@@ -9,7 +9,7 @@ The Red-Black Tree is a type of BST that is auto-balanced.
 ## Algorithms
 The red-black tree ensures that all the main operations such as: insertion, deletion and searching are perfomed with 
 O(log n) complexity.  
-To make this possible, after each insertion or deletion the tree has to be checked on violations and in case they are present, the tree has to be rebalanced. The red-black tree is a superset of the AVL-tree which means that the balancing is performed by the rotation operations. The red-black tree also provides a new operation called recoloring. Each node is either red or white and there are some related properties.
+To make this possible, after each insertion or deletion the tree has to be checked on violations and in case they are present, the tree has to be rebalanced. The red-black tree is a superset of the AVL-tree which means that the balancing is performed by the rotation operations. The red-black tree also provides a new operation called recoloring. Each node is either red or black and there are some related properties.
 
 Properties of the red-black tree:  
 1. Each node is either black or red;
@@ -28,7 +28,7 @@ Read more about the implementation of the basic operations:
 ## How to use
 > WARNING: This code shouldn't be used in production.  
 > The data structure is not optimised because for each call of the Insert/Delete methods, new/delete operators are called.
-> Instead use the STL's std::map contained
+> Instead use the STL's std::map container
 
 ```C++
 void RedBlackTree<T>::Insert(T value); // Inserts a value into the tree
