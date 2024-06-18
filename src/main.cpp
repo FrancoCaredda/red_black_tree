@@ -21,5 +21,9 @@ int main(int argc, char** argv)
         std::cout << value << " ";
     });
 
+    std::cout << "\n" << std::boolalpha
+        << "Does the tree contain the number 5: " << tree.Contains(5) << "\n"
+        << "Does the tree contain the number 10: " << tree.Contains(10) << std::endl;
+
     return 0;
 }

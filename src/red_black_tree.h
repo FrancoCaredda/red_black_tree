@@ -63,8 +63,20 @@ public:
         }
     }
 
-    bool Search(T value) const
+    bool Contains(T value) const
     {
+        Node<T>* currentNode = m_Root;
+
+        while (currentNode != nullptr)
+        {
+            if (value > currentNode->data)
+                currentNode = currentNode->right;
+            else if (value < currentNode->data)
+                currentNode = currentNode->left;
+            else
+                return true;
+        }
+        
         return false;
     }
 
