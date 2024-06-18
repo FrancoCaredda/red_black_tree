@@ -49,13 +49,17 @@ public:
             if (IsRed(node->parent) && IsRed(GetUncle(node)))
             {
                 FixRedUncleViolation(node);
+                node = node->parent->parent;
             }
             else if (IsRed(node->parent))
             {
                 FixBlackUncleViolation(node);
+                node = node->parent;
             }
-
-            node = node->parent;
+            else
+            {
+                node = node->parent->parent;
+            }
         }
     }
 

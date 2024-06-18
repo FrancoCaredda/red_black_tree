@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 {
     RedBlackTree<int> tree;
 
-    std::vector<int> arr = { 10, 9, 8, 7, 6, 5, 4, 3 };
+    std::vector<int> arr = { 4, 2, 3, 0, 6, 1, 5 };
 
     for (const int val : arr)
     {
